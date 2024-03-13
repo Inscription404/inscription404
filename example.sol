@@ -53,7 +53,14 @@ contract MyToken is ERC20, ERC20Burnable, Ownable, ERC20Permit, IInscription404 
 
     function mint(address to, uint256 amount) public onlyOwner {
         _mint(to, amount);
+        emit TransferToken(address(0), to, amount, decimals());
     }
+
+    function burn(address account, uint256 amount) public onlyOwner {
+        _burn(account, amount);
+        emit TransferToken(account,address(0),  amount, decimals());
+    }
+
 
     function tokenURI(uint256 tokenId) external view returns (string memory) {
                 return    bytes(baseURI).length > 0
