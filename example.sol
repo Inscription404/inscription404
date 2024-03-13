@@ -8,7 +8,7 @@ import "@openzeppelin/contracts@5.0.2/access/Ownable.sol";
 import "@openzeppelin/contracts@5.0.2/token/ERC20/extensions/ERC20Permit.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 
-interface Inscription404 {
+interface IInscription404 {
     event TransferToken(
         address indexed from,
         address indexed to,
@@ -41,7 +41,7 @@ interface Inscription404 {
     ) external returns (bool);
 }
 
-contract MyToken is ERC20, ERC20Burnable, Ownable, ERC20Permit, Inscription404 {
+contract MyToken is ERC20, ERC20Burnable, Ownable, ERC20Permit, IInscription404 {
     using Strings for uint256;
 
     constructor(address initialOwner)
@@ -68,8 +68,6 @@ contract MyToken is ERC20, ERC20Burnable, Ownable, ERC20Permit, Inscription404 {
         uint256 amount = 1 * 10**decimals();
         address owner = _msgSender();
 
-        // transfer(sender, recipient, amount);
-
         ERC20.transfer(recipient, amount);
         emit TransferNFT(owner, recipient, amount, tokenID, decimals());
         return true;
@@ -88,12 +86,24 @@ contract MyToken is ERC20, ERC20Burnable, Ownable, ERC20Permit, Inscription404 {
         return true;
     }
 
-    function _update(
-        address from,
-        address to,
-        uint256 value
-    ) internal virtual override {
-        ERC20._update(from, to, value);
-        emit TransferToken(from, to, value, decimals());
+    function transfer(address to, uint256 value) public virtual override  returns (bool) {
+        address owner = _msgSender();
+
+        ERC20.transfer(to, value);
+
+        emit TransferToken(owner, to, value, decimals());
+
+        return true;
     }
+
+
+    function transferFrom(address from, address to, uint256 value) public virtual override returns (bool) {
+        
+        ERC20.transferFrom(from, to, value);
+
+        emit TransferToken(from, to, value, decimals());
+
+        return true;
+    }
+
 }
